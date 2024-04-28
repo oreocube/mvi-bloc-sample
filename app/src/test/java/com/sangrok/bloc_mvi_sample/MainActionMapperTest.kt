@@ -14,8 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 /**
@@ -90,4 +88,34 @@ class MainActionMapperTest {
         }
     }
 
+    @Test
+    fun `GIVEN 멤버 목록, 특정 멤버 WHEN 좋아요 상태 변경 THEN 변경된 멤버 목록`() = runTest {
+        //GIVEN
+        val members = (0..5).map {
+            Member(
+                name = "$it",
+                liked = false
+            )
+        }
+        whenever(mockRepository.getMembers()).thenReturn(members)
+
+        val givenState = MainState.INITIAL_STATE.copy(members = members)
+        val givenMember = members.random()
+
+        val index = members.indexOfFirst { it.name == givenMember.name }
+        val list = members.toMutableList().apply {
+            set(index, givenMember)
+        }
+
+        //WHEN
+        val action = MainAction.SetMemberState(givenMember)
+        val actual = mainActionMapper.mapActionToState(action, givenState).last()
+
+        //THEN
+        val expect = givenState.copy(
+            members = list,
+            isLoading = false,
+        )
+        Assert.assertEquals(expect, actual)
+    }
 }

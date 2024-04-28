@@ -4,13 +4,14 @@ import com.sangrok.bloc_mvi_sample.ui.main.Member
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-interface MockRepository{
+interface MockRepository {
     suspend fun getMembers(): List<Member>
+    suspend fun like(member: Member): Member
 }
 
 class MockRepositoryImpl @Inject constructor(
 
-): MockRepository {
+) : MockRepository {
     override suspend fun getMembers(): List<Member> {
         delay(1000L)
         return listOf(
@@ -23,7 +24,7 @@ class MockRepositoryImpl @Inject constructor(
         )
     }
 
-    suspend fun like(member: Member): Member {
+    override suspend fun like(member: Member): Member {
         delay(3000L)
         return member.copy(liked = member.liked.not())
     }
