@@ -39,4 +39,20 @@ class MainActionTransformerTest {
         val expect = MainAction.SetMemberState(member.copy(liked = member.liked.not()))
         Assert.assertEquals(expect, actual)
     }
+
+
+    @Test
+    fun `GIVEN 멤버 WHEN 토글 예외 발생 시 THEN 롤백한다`() = runTest {
+        //GIVEN
+        val member = Member(name = "하하", liked = false)
+        whenever(mockRepository.like(member)).thenThrow(IllegalStateException())
+
+        //WHEN
+        val action = MainAction.ClickToggle(member)
+        val actual = mainActionTransformer.transformActions(action).last()
+
+        //THEN
+        val expect = MainAction.SetMemberState(member)
+        Assert.assertEquals(expect, actual)
+    }
 }
